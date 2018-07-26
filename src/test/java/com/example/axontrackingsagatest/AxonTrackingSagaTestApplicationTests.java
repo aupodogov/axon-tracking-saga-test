@@ -33,4 +33,15 @@ public class AxonTrackingSagaTestApplicationTests {
 		verify(sampleService, timeout(10000).times(3)).someMethod();
 	}
 
+	@Test
+	public void testEventProcessor() throws Exception {
+	    when(sampleService.otherMethod())
+                .thenThrow(new Exception())
+                .thenThrow(new IllegalStateException())
+                .thenReturn("Ok");
+		commandGateway.sendAndWait(new CreateSampleAggregateCommand(UUID.randomUUID()));
+
+		verify(sampleService, timeout(10000).times(3)).otherMethod();
+	}
+
 }
