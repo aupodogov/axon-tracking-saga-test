@@ -6,7 +6,7 @@ import org.axonframework.modelling.command.TargetAggregateIdentifier;
 import java.util.UUID;
 
 @Value
-public class CreateSampleAggregateCommand {
+public class ModifySampleAggregateCommand {
     @TargetAggregateIdentifier
     private final UUID id;
 }

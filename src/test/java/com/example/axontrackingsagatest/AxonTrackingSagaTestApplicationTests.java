@@ -1,47 +1,30 @@
 package com.example.axontrackingsagatest;
 
 import com.example.axontrackingsagatest.domain.api.CreateSampleAggregateCommand;
-import com.example.axontrackingsagatest.domain.service.SampleService;
+import com.example.axontrackingsagatest.domain.api.ModifySampleAggregateCommand;
 import org.axonframework.commandhandling.gateway.CommandGateway;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.ContextConfiguration;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.UUID;
 
-import static org.mockito.Mockito.*;
-
-@RunWith(SpringRunner.class)
+@Testcontainers
 @SpringBootTest
-public class AxonTrackingSagaTestApplicationTests {
-    @MockBean
-    private SampleService sampleService;
+@ContextConfiguration(initializers = {AbstractContainerBaseTest.Initializer.class})
+public class AxonTrackingSagaTestApplicationTests extends AbstractContainerBaseTest {
     @Autowired
     private CommandGateway commandGateway;
 
-	@Test
-	public void testSaga() throws Exception {
-	    when(sampleService.someMethod())
-                .thenThrow(new Exception())
-                .thenThrow(new IllegalStateException())
-                .thenReturn("Ok");
-		commandGateway.sendAndWait(new CreateSampleAggregateCommand(UUID.randomUUID()));
-
-		verify(sampleService, timeout(10000).times(3)).someMethod();
-	}
-
-	@Test
-	public void testEventProcessor() throws Exception {
-	    when(sampleService.otherMethod())
-                .thenThrow(new Exception())
-                .thenThrow(new IllegalStateException())
-                .thenReturn("Ok");
-		commandGateway.sendAndWait(new CreateSampleAggregateCommand(UUID.randomUUID()));
-
-		verify(sampleService, timeout(10000).times(3)).otherMethod();
-	}
-
+    @Test
+    void testSnapshotting() throws InterruptedException {
+        final UUID id = UUID.randomUUID();
+        commandGateway.sendAndWait(new CreateSampleAggregateCommand(id));
+        for (int i = 0; i < 100; i++) {
+            commandGateway.sendAndWait(new ModifySampleAggregateCommand(id));
+        }
+        Thread.sleep(30000);
+    }
 }
