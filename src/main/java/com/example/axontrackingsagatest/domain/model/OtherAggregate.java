@@ -1,9 +1,8 @@
 package com.example.axontrackingsagatest.domain.model;
 
-import com.example.axontrackingsagatest.domain.api.CreateSampleAggregateCommand;
-import com.example.axontrackingsagatest.domain.api.ModifySampleAggregateCommand;
+import com.example.axontrackingsagatest.domain.api.CreateOtherAggregateCommand;
+import com.example.axontrackingsagatest.domain.api.OtherAggregateCreated;
 import com.example.axontrackingsagatest.domain.api.SampleAggregateCreated;
-import com.example.axontrackingsagatest.domain.api.SampleAggregateModified;
 import lombok.NoArgsConstructor;
 import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.eventsourcing.EventSourcingHandler;
@@ -15,25 +14,20 @@ import java.util.UUID;
 
 import static org.axonframework.modelling.command.AggregateLifecycle.apply;
 
-@Revision("1.0")
-@Aggregate(snapshotTriggerDefinition = "sampleSnapshotTrigger", snapshotFilter = "sampleSnapshotFilter", cache = "aggregateCache")
+@Revision("1.1")
+@Aggregate(snapshotTriggerDefinition = "otherSnapshotTrigger", snapshotFilter = "otherSnapshotFilter", cache = "aggregateCache")
 @NoArgsConstructor
-public class SampleAggregate {
+public class OtherAggregate {
     @AggregateIdentifier
     private UUID id;
 
     @CommandHandler
-    public SampleAggregate(CreateSampleAggregateCommand command) {
+    public OtherAggregate(CreateOtherAggregateCommand command) {
         apply(new SampleAggregateCreated(command.getId()));
     }
 
-    @CommandHandler
-    public void handle(ModifySampleAggregateCommand command) {
-        apply(new SampleAggregateModified(command.getId()));
-    }
-
     @EventSourcingHandler
-    public void on(SampleAggregateCreated event) {
+    public void on(OtherAggregateCreated event) {
         this.id = event.getId();
     }
 }

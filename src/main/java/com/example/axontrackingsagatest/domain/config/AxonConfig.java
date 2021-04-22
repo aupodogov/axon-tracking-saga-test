@@ -24,4 +24,17 @@ public class AxonConfig {
         return snapshotData -> "1.0".equals(snapshotData.getPayload().getType().getRevision());
     }
 
+    @Bean
+    public SnapshotTriggerDefinition otherSnapshotTrigger(
+            @Value("${axon.snapshot-trigger.threshold:20}") int threshold,
+            Snapshotter snapshotter
+    ) {
+        return new EventCountSnapshotTriggerDefinition(snapshotter, threshold);
+    }
+
+    @Bean
+    public SnapshotFilter otherSnapshotFilter() {
+        return snapshotData -> "1.1".equals(snapshotData.getPayload().getType().getRevision());
+    }
+
 }
